@@ -1,0 +1,39 @@
+server:
+  port: 8090
+  tomcat:
+    threads:
+      # Note: When virtual threads are enabled (spring.threads.virtual.enabled=true),
+      # Tomcat uses an unbounded Virtual Thread Per Task Executor for incoming HTTP requests.
+      max: 200
+      min-spare: 10
+
+spring:
+  application:
+    name: spring-boot-virtual-threads-demo
+  threads:
+    virtual:
+      # MASTER TOGGLE: Enables Java 21+ Virtual Threads across Spring Boot
+      # - Configures Tomcat/Jetty to execute each HTTP request in a virtual thread
+      # - Configures Spring TaskExecutor / @Async to use virtual threads
+      # - Configures Scheduling / ApplicationEvents to use virtual threads
+      enabled: true
+
+# Observability and Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus,threaddump"
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    root: INFO
+    com.example.virtualthreads: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
